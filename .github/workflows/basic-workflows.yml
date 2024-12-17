@@ -1,0 +1,13 @@
+name: Basic workflow run
+
+on:
+    workflow_dispatch:
+        
+
+jobs:
+    project-building:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Runing project
+              run: echo "hello Project"

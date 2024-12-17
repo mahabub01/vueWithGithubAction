@@ -30,7 +30,7 @@ jobs:
 
             - name: Push Image
               run: | 
-                docker login -u mahabub01 -p ${{ secrets.DOCKERHUB_PASSWORD }}
+                echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u mahabub01 --password-stdin
                 docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$TAG
                 docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
                 

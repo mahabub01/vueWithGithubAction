@@ -16,8 +16,8 @@ jobs:
         run: |
 
           # Build the Docker image
-          docker build -t mahabub01/${{ github.repository}}:${{ github.ref_name}} .
-          docker tag mahabub01/vue-with-nginx:${{ github.ref_name}} mahabub01/vue-with-nginx:latest
+          docker build -t mahabub01/vue-with-nginx:${{ github.run_id}} .
+          docker tag mahabub01/vue-with-nginx:${{ github.run_id}} mahabub01/vue-with-nginx:latest
 
       - name: Push Docker Image
         run: |
@@ -26,5 +26,5 @@ jobs:
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
           # Push the image to Docker Hub
-          docker push mahabub01/${{ github.repository}}:${{ github.ref_name}}
-          docker push mahabub01/${{ github.repository}}:latest
+          docker push mahabub01/vue-with-nginx:${{ github.run_id}}
+          docker push mahabub01/vue-with-nginx:latest

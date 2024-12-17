@@ -32,6 +32,9 @@ jobs:
                     TAG=${{ github.sha_short }}
                 fi
 
+                echo "Testing image name................"
+                echo $IMAGE_NAME:$TAG
+                echo "Testing image name................"
                 docker build -t mahabub01/$IMAGE_NAME:$TAG .
                 docker tag mahabub01/$IMAGE_NAME:$TAG mahabub01/$IMAGE_NAME:latest
 

@@ -25,11 +25,11 @@ jobs:
 
                 elif [ "${{ github.event_name }}" == "pull_request" ]; then
                     
-                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha::8 }}
+                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha_short }}
 
                 else
                     # Fallback: Use short SHA
-                    TAG=${{ github.sha::8 }}
+                    TAG=${{ github.sha_short }}
                 fi
 
                 docker build -t mahabub01/$IMAGE_NAME:$TAG .

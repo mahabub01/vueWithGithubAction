@@ -17,20 +17,29 @@ jobs:
               run: |
                 IMAGE_NAME=vue-with-nginx
 
+                SAFE_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+
                 if [ "${{ github.event_name }}" == "push" ]; then
-                    TAG=$(echo ${{ github.ref_name }} | sed 's/\//-/g')-$(date +%Y%m%d%H%M%S)
+                
+                    TAG=${SAFE_BRANCH}-$(date +%Y%m%d%H%M%S)
+
+                elif [ "${{ github.event_name }}" == "pull_request" ]; then
+                    
+                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha::8 }}
+
                 else
-                    TAG=pr-${{ github.event.pull_request.number }}
+                    # Fallback: Use short SHA
+                    TAG=${{ github.sha::8 }}
                 fi
 
-                docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$TAG .
-                docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$TAG ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
+                docker build -t mahabub01/$IMAGE_NAME:$TAG .
+                docker tag mahabub01/$IMAGE_NAME:$TAG mahabub01/$IMAGE_NAME:latest
 
 
 
             - name: Push Image
               run: | 
                 echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u mahabub01 --password-stdin
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$TAG
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
+                docker push mahabub01/$IMAGE_NAME:$TAG
+                docker push mahabub01/$IMAGE_NAME:latest
                 

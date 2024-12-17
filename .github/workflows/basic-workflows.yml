@@ -1,50 +1,59 @@
-name: Vue project Ingeration
+name: Vue Project Integration
 
 on:
-    push:
-        branches:
-            - main
-
+  push:
+    branches:
+      - main
 
 jobs:
-    project-building:
-        runs-on: ubuntu-latest
-        steps:
-            - name: checkout 
-              uses: actions/checkout@v4
+  project-building:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-            - name: Build Image
-              run: |
-                IMAGE_NAME=vue-with-nginx >> $GITHUB_ENV
+      - name: Build Docker Image
+        run: |
+          # Set the image name
+          echo "IMAGE_NAME=vue-with-nginx" >> $GITHUB_ENV
 
-                SAFE_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          # Sanitize branch name
+          SAFE_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
 
-                if [ "${{ github.event_name }}" == "push" ]; then
-                
-                    TAG=${SAFE_BRANCH}-$(date +%Y%m%d%H%M%S) >> $GITHUB_ENV
+          # Generate the tag dynamically based on the event
+          if [ "${{ github.event_name }}" == "push" ]; then
+              TAG="${SAFE_BRANCH}-$(date +%Y%m%d%H%M%S)"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+              PR_NUMBER="${{ github.event.pull_request.number }}"
+              SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+              TAG="pr-${PR_NUMBER}-${SHORT_SHA}"
+          else
+              SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+              TAG="${SHORT_SHA}"
+          fi
 
-                elif [ "${{ github.event_name }}" == "pull_request" ]; then
-                    
-                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha_short }} >> $GITHUB_ENV
+          # Export the TAG as an environment variable
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
-                else
-                    # Fallback: Use short SHA
-                    TAG=${{ github.sha_short }} >> $GITHUB_ENV
-                fi
+          # Debugging: Verify image name and tag
+          echo "Testing image name................"
+          echo "${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:$TAG"
+          echo "Testing image name................"
 
-                echo "Testing image name................"
-                echo $IMAGE_NAME:$TAG
-                echo "Testing image name................"
-                docker build -t mahabub01/$IMAGE_NAME:$TAG .
-                docker tag mahabub01/$IMAGE_NAME:$TAG mahabub01/$IMAGE_NAME:latest
+          # Build the Docker image
+          docker build -t mahabub01/$IMAGE_NAME:$TAG .
+          docker tag mahabub01/$IMAGE_NAME:$TAG mahabub01/$IMAGE_NAME:latest
 
+      - name: Push Docker Image
+        run: |
+          # Log in to Docker Hub
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+          # Debugging: Verify tag and image
+          echo "Testing name .............................."
+          echo "mahabub01/$IMAGE_NAME:$TAG"
+          echo "Testing name .............................."
 
-            - name: Push Image
-              run: | 
-                echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u mahabub01 --password-stdin
-                echo "mahabub01/"
-                echo ${IMAGE_NAME}:${TAG}
-                docker push mahabub01/$IMAGE_NAME:$TAG
-                docker push mahabub01/$IMAGE_NAME:latest
-                
+          # Push the image to Docker Hub
+          docker push mahabub01/$IMAGE_NAME:$TAG
+          docker push mahabub01/$IMAGE_NAME:latest

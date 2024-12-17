@@ -15,21 +15,21 @@ jobs:
 
             - name: Build Image
               run: |
-                IMAGE_NAME=vue-with-nginx
+                IMAGE_NAME=vue-with-nginx >> $GITHUB_ENV
 
                 SAFE_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
 
                 if [ "${{ github.event_name }}" == "push" ]; then
                 
-                    TAG=${SAFE_BRANCH}-$(date +%Y%m%d%H%M%S)
+                    TAG=${SAFE_BRANCH}-$(date +%Y%m%d%H%M%S) >> $GITHUB_ENV
 
                 elif [ "${{ github.event_name }}" == "pull_request" ]; then
                     
-                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha_short }}
+                TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha_short }} >> $GITHUB_ENV
 
                 else
                     # Fallback: Use short SHA
-                    TAG=${{ github.sha_short }}
+                    TAG=${{ github.sha_short }} >> $GITHUB_ENV
                 fi
 
                 echo "Testing image name................"

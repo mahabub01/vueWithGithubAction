@@ -37,7 +37,7 @@ jobs:
 
           # Debugging: Verify image name and tag
           echo "Testing image name................"
-          echo "${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:$TAG"
+          echo "${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$TAG"
           echo "Testing image name................"
 
           # Build the Docker image

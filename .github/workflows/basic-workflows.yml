@@ -2,12 +2,19 @@ name: Basic workflow run
 
 on:
     workflow_dispatch:
-        
+
 
 jobs:
     project-building:
         runs-on: ubuntu-latest
-
         steps:
-            - name: Runing project
-              run: echo "hello Project"
+            - name: checkout 
+              uses: actions/checkout@v4
+
+            - name: Build Image
+              run: docker build -t mahabub01/vue-with-nginx:latest .
+
+            - name: Push Image
+              run: | 
+                docker login -u mahabub01 -p ${{ secrets.DOCKERHUB_PASSWORD }}
+                docker push mahabub01/vue-with-nginx:latest

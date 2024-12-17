@@ -41,7 +41,7 @@ jobs:
               run: | 
                 echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u mahabub01 --password-stdin
                 echo "mahabub01/"
-                echo $IMAGE_NAME:$TAG
+                echo ${IMAGE_NAME}:${TAG}
                 docker push mahabub01/$IMAGE_NAME:$TAG
                 docker push mahabub01/$IMAGE_NAME:latest
                 

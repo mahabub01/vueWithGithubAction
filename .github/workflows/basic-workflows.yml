@@ -1,7 +1,9 @@
-name: Basic workflow run
+name: Vue project Ingeration
 
 on:
-    workflow_dispatch:
+    push:
+        branches:
+            - main
 
 
 jobs:
